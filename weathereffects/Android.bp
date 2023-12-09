@@ -47,6 +47,10 @@ android_library {
         // TODO(b/300991599): Split out debug resources.
         "debug/res"
     ],
+    // TODO(b/300991599): Split out debug resources.
+    asset_dirs: [
+        "debug/assets"
+    ],
     javacflags: ["-Adagger.fastInit=enabled"],
     kotlincflags: ["-Xjvm-default=all"],
     plugins: ["dagger2-compiler"],
@@ -55,8 +59,10 @@ android_library {
     platform_apis: false
 }
 
+// Debug app.
 android_app {
-    name: "WeatherEffects",
+    name: "WeatherEffectsDebug",
+    manifest: "debug/AndroidManifest.xml",
     owner: "google",
     privileged: false,
     sdk_version: "system_current",
@@ -65,6 +71,7 @@ android_app {
         "WeatherEffectsLib"
     ],
     use_embedded_native_libs: true,
+    plugins: ["dagger2-compiler"],
     optimize: {
         enabled: true,
         shrink: true,
@@ -74,7 +81,7 @@ android_app {
 
 android_test {
     name: "weathereffects_tests",
-    instrumentation_for: "WeatherEffects",
+    instrumentation_for: "WeatherEffectsDebug",
     manifest: "AndroidManifest.xml",
     test_suites: ["general-tests"],
     sdk_version: "current",
