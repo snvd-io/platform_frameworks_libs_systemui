@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.app.tracing
-
-import com.android.app.tracing.TraceUtils.Companion.traceCoroutine
+package com.android.app.tracing.coroutines
 
 /**
  * Represents a section of code executing in a coroutine. This can be split up into multiple slices
@@ -29,7 +27,7 @@ import com.android.app.tracing.TraceUtils.Companion.traceCoroutine
  * @param id used for matching the beginning and end of trace sections and validating correctness
  * @see traceCoroutine
  */
-data class TraceSection(
+internal data class TraceSection(
     val name: String,
     val id: Int,
 )

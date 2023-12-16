@@ -23,9 +23,9 @@ object FlowTracing {
 
     /** Logs each flow element to a trace. */
     inline fun <T> Flow<T>.traceEach(
-            flowName: String,
-            logcat: Boolean = false,
-            crossinline valueToString: (T) -> String = { it.toString() }
+        flowName: String,
+        logcat: Boolean = false,
+        crossinline valueToString: (T) -> String = { it.toString() }
     ): Flow<T> {
         val stateLogger = TraceStateLogger(flowName, logcat = logcat)
         return onEach { stateLogger.log(valueToString(it)) }

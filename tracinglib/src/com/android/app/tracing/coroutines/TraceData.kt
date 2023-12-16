@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.android.app.tracing
+package com.android.app.tracing.coroutines
 
 import android.os.Build
 import android.util.Log
-import com.android.app.tracing.TraceUtils.Companion.beginSlice
-import com.android.app.tracing.TraceUtils.Companion.endSlice
-import com.android.app.tracing.TraceUtils.Companion.traceCoroutine
+import com.android.app.tracing.beginSlice
+import com.android.app.tracing.endSlice
 import kotlin.random.Random
 
 /**
@@ -35,7 +34,11 @@ import kotlin.random.Random
  *
  * @see traceCoroutine
  */
-val threadLocalTrace = ThreadLocal<TraceData?>()
+internal val threadLocalTrace = ThreadLocal<TraceData?>()
+
+@PublishedApi internal sealed interface TraceStatus
+
+@PublishedApi internal data class MissingTraceData(val message: String) : TraceStatus
 
 /**
  * Used for storing trace sections so that they can be added and removed from the currently running
@@ -46,18 +49,19 @@ val threadLocalTrace = ThreadLocal<TraceData?>()
  *
  * @see traceCoroutine
  */
-class TraceData {
+@PublishedApi
+internal class TraceData : TraceStatus {
     private var slices = mutableListOf<TraceSection>()
 
     /** Adds current trace slices back to the current thread. Called when coroutine is resumed. */
-    fun beginAllOnThread() {
+    internal fun beginAllOnThread() {
         slices.forEach { beginSlice(it.name) }
     }
 
     /**
      * Removes all current trace slices from the current thread. Called when coroutine is suspended.
      */
-    fun endAllOnThread() {
+    internal fun endAllOnThread() {
         for (i in 0..slices.size) {
             endSlice()
         }
@@ -69,7 +73,8 @@ class TraceData {
      * coroutines, or to child coroutines that have already started. The unique ID is used to verify
      * that the [endSpan] is corresponds to a [beginSpan].
      */
-    fun beginSpan(name: String): Int {
+    @PublishedApi
+    internal fun beginSpan(name: String): Int {
         val newSlice = TraceSection(name, Random.nextInt(FIRST_VALID_SPAN, Int.MAX_VALUE))
         slices.add(newSlice)
         beginSlice(name)
@@ -80,7 +85,7 @@ class TraceData {
      * Used by [TraceContextElement] when launching a child coroutine so that the child coroutine's
      * state is isolated from the parent.
      */
-    fun copy(): TraceData {
+    internal fun copy(): TraceData {
         return TraceData().also { it.slices.addAll(slices) }
     }
 
@@ -89,22 +94,24 @@ class TraceData {
      * trace slice will immediately be removed from the current thread. This information will not
      * propagate to parent coroutines, or to child coroutines that have already started.
      */
-    fun endSpan(id: Int) {
+    @PublishedApi
+    internal fun endSpan(id: Int) {
         val v = slices.removeLast()
         if (v.id != id) {
             if (STRICT_MODE) {
-                throw IllegalArgumentException(errorMsg)
+                throw IllegalArgumentException(MISMATCHED_TRACE_ERROR_MESSAGE)
             } else if (Log.isLoggable(TAG, Log.VERBOSE)) {
-                Log.v(TAG, errorMsg)
+                Log.v(TAG, MISMATCHED_TRACE_ERROR_MESSAGE)
             }
         }
         endSlice()
     }
 
-    companion object {
+    @PublishedApi
+    internal companion object {
         private const val TAG = "TraceData"
-        const val INVALID_SPAN = -1
-        const val FIRST_VALID_SPAN = 1
+        @PublishedApi internal const val INVALID_SPAN = -1
+        @PublishedApi internal val FIRST_VALID_SPAN = 1
 
         /**
          * If true, throw an exception instead of printing a warning when trace sections beginnings
@@ -112,11 +119,15 @@ class TraceData {
          */
         private val STRICT_MODE = Build.IS_ENG
 
-        private const val errorMsg =
-            "Mismatched trace section. This likely means you are accessing the trace local " +
-                "storage (threadLocalTrace) without a corresponding CopyableThreadContextElement." +
-                " This could happen if you are using a global dispatcher like Dispatchers.IO." +
-                " To fix this, use one of the coroutine contexts provided by the dagger scope " +
-                "(e.g. \"@Main CoroutineContext\")."
+        private val MISMATCHED_TRACE_ERROR_MESSAGE =
+            """
+              Mismatched trace section. This likely means you are accessing the trace local \
+              storage (threadLocalTrace) without a corresponding CopyableThreadContextElement. \
+              This could happen if you are using a global dispatcher like Dispatchers.IO. \
+              To fix this, use one of the coroutine contexts provided by the dagger scope  \
+              (e.g. \"@Main CoroutineContext\").
+        """
+                .trimIndent()
+                .replace("\\\n", "")
     }
 }
