@@ -14,15 +14,24 @@
  * limitations under the License.
  */
 
-package com.android.app.tracing
+package com.android.app.tracing.coroutines
 
-import com.android.app.tracing.TraceUtils.Companion.instant
-import com.android.app.tracing.TraceUtils.Companion.traceCoroutine
+import com.android.app.tracing.TraceUtils.instant
+import com.android.systemui.Flags.coroutineTracing
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlinx.coroutines.CopyableThreadContextElement
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+
+/**
+ * Returns a new [CoroutineContext] used for tracing. Used to hide internal implementation details.
+ */
+@OptIn(ExperimentalCoroutinesApi::class)
+fun createCoroutineTracingContext(): CoroutineContext {
+    return if (coroutineTracing()) TraceContextElement() else EmptyCoroutineContext
+}
 
 /**
  * Used for safely persisting [TraceData] state when coroutines are suspended and resumed.
@@ -34,12 +43,13 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
  */
 @OptIn(DelicateCoroutinesApi::class)
 @ExperimentalCoroutinesApi
-class TraceContextElement(private val traceData: TraceData = TraceData()) :
+internal class TraceContextElement(private val traceData: TraceData = TraceData()) :
     CopyableThreadContextElement<TraceData?> {
 
-    companion object Key : CoroutineContext.Key<TraceContextElement>
+    internal companion object Key : CoroutineContext.Key<TraceContextElement>
 
-    override val key: CoroutineContext.Key<TraceContextElement> = Key
+    override val key: CoroutineContext.Key<*>
+        get() = Key
 
     @OptIn(ExperimentalStdlibApi::class)
     override fun updateThreadContext(context: CoroutineContext): TraceData? {
