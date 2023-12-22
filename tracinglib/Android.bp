@@ -20,6 +20,7 @@ java_library {
     name: "tracinglib",
     static_libs: [
         "kotlinx_coroutines_android",
+        "com_android_systemui_flags_lib",
     ],
     srcs: [
         "src/**/*.kt"
