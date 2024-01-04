@@ -17,13 +17,35 @@
 // Copied from frameworks/base/packages/SystemUI/animation/src/com/android/systemui/surfaceeffects/
 // shaderutil/ShaderUtilLibrary.kt
 
-// Return range [-1, 1].
-vec3 hash(vec3 p) {
-    p = fract(p * vec3(.3456, .1234, .9876));
-    p += dot(p, p.yxz + 43.21);
-    p = (p.xxy + p.yxx) * p.zyx;
-    return (fract(sin(p) * 4567.1234567) - .5) * 2.;
+// Integer mod.
+int imod(int a, int b) {
+    return a - (b * (a / b));
 }
+
+ivec3 imod(ivec3 a, int b) {
+    return ivec3(imod(a.x, b), imod(a.y, b), imod(a.z, b));
+}
+
+// Integer based hash function with the return range of [-1, 1].
+vec3 hash(vec3 p) {
+    ivec3 v = ivec3(p);
+    v = v * 1671731 + 10139267;
+
+    v.x += v.y * v.z;
+    v.y += v.z * v.x;
+    v.z += v.x * v.y;
+
+    ivec3 v2 = v / 65536; // v >> 16
+    v = imod((10 - imod((v + v2), 10)), 10); // v ^ v2
+
+    v.x += v.y * v.z;
+    v.y += v.z * v.x;
+    v.z += v.x * v.y;
+
+    // Use sin and cos to map the range to [-1, 1].
+    return vec3(sin(float(v.x)), cos(float(v.y)), sin(float(v.z)));
+}
+
 // Skew factors (non-uniform).
 const float SKEW = 0.3333333;  // 1/3
 const float UNSKEW = 0.1666667;  // 1/6
@@ -32,7 +54,7 @@ const float UNSKEW = 0.1666667;  // 1/6
 // It's because the hash function (that returns a random gradient vector) returns
 // different magnitude of vectors. Noise doesn't have to be in the precise range thus
 // skipped normalize.
-float simplex3d(vec3 p) {
+half simplex3d(vec3 p) {
     // Skew the input coordinate, so that we get squashed cubical grid
     vec3 s = floor(p + (p.x + p.y + p.z) * SKEW);
 
