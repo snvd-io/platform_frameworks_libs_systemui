@@ -31,6 +31,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.DrawableWrapper;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 import androidx.annotation.Nullable;
 
 /**
@@ -54,9 +55,13 @@ public class UserBadgeDrawable extends DrawableWrapper {
     private final int mBgColor;
     private boolean mShouldDrawBackground = true;
 
+    @VisibleForTesting
+    public final boolean mIsThemed;
+
     public UserBadgeDrawable(Context context, int badgeRes, int colorRes, boolean isThemed) {
         super(context.getDrawable(badgeRes));
 
+        mIsThemed = isThemed;
         if (isThemed) {
             mutate();
             mBaseColor = context.getColor(R.color.themed_badge_icon_color);
@@ -71,6 +76,7 @@ public class UserBadgeDrawable extends DrawableWrapper {
     private UserBadgeDrawable(Drawable base, int bgColor, int baseColor,
             boolean shouldDrawBackground) {
         super(base);
+        mIsThemed = false;
         mBgColor = bgColor;
         mBaseColor = baseColor;
         mShouldDrawBackground = shouldDrawBackground;
