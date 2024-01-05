@@ -6,3 +6,10 @@ flag {
     description: "An Example Flag"
     bug: "308482106"
 }
+
+flag {
+    name: "shade_allow_back_gesture"
+    namespace: "systemui"
+    description: "Allow Back Gestures in Shade"
+    bug: "309545085"
+}
