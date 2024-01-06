@@ -30,6 +30,23 @@ vec2 getVectorFromAngle(float theta) {
     return vec2(cos(theta), sin(theta));
 }
 
+int imod(int a, int b) {
+    return a - (b * (a / b));
+}
+
+// 2D hash without bit-wise operations
+vec2 hash(vec2 p) {
+    int a = int(p.x + p.y) * 15823;
+    int b = a * 65536; // a << 16
+
+    a = imod((10 - imod((a + b), 10)), 10); // a ^ b = (base - (a + b) % base) % base
+    a = (a * (a * a * 38833 + 683873) + 19734581);
+    a /= 65536; // a >> 16
+
+    float af = float(a);
+    return vec2(cos(af), sin(af));
+}
+
 // Returns kernel summation from the given simplex vertices (v0, v1, v2), and their corresponding
 // gradients (g0, g1, g2).
 float kernel_summation(vec2 v0, vec2 v1, vec2 v2, vec2 g0, vec2 g1, vec2 g2) {

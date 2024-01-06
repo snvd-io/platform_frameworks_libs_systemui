@@ -170,14 +170,17 @@ public class BitmapInfo {
         if (badgeInfo != null) {
             return badgeInfo.newIcon(context, isThemed ? FLAG_THEMED : 0);
         } else if ((flags & FLAG_INSTANT) != 0) {
-            return new UserBadgeDrawable(context, R.drawable.ic_instant_app_badge, isThemed);
+            return new UserBadgeDrawable(context, R.drawable.ic_instant_app_badge,
+                    R.color.badge_tint_instant, isThemed);
         } else if ((flags & FLAG_WORK) != 0) {
-            return new UserBadgeDrawable(context, R.drawable.ic_work_app_badge, isThemed);
+            return new UserBadgeDrawable(context, R.drawable.ic_work_app_badge,
+                    R.color.badge_tint_work, isThemed);
         } else if ((flags & FLAG_CLONE) != 0) {
-            return new UserBadgeDrawable(context, R.drawable.ic_clone_app_badge, isThemed);
+            return new UserBadgeDrawable(context, R.drawable.ic_clone_app_badge,
+                    R.color.badge_tint_clone, isThemed);
         } else if ((flags & FLAG_PRIVATE) != 0) {
-            return new UserBadgeDrawable(
-                    context, R.drawable.ic_private_profile_app_badge, isThemed);
+            return new UserBadgeDrawable(context, R.drawable.ic_private_profile_app_badge,
+                    R.color.badge_tint_private, isThemed);
         }
         return null;
     }
