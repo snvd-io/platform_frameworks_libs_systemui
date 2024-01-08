@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.google.android.wallpaper.weathereffects.rain
+package com.google.android.wallpaper.weathereffects.graphics.rain
 
 import android.graphics.BitmapShader
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Shader
 import android.util.SizeF
-import com.google.android.torus.utils.extensions.getAspectRatio
-import com.google.android.wallpaper.weathereffects.WeatherEffect
-import com.google.android.wallpaper.weathereffects.utils.ImageCrop
+import com.google.android.wallpaper.weathereffects.graphics.WeatherEffect
+import com.google.android.wallpaper.weathereffects.graphics.utils.GraphicsUtils
+import com.google.android.wallpaper.weathereffects.graphics.utils.ImageCrop
 import kotlin.random.Random
 
 /** Defines and generates the rain weather effect animation. */
@@ -65,12 +65,13 @@ class RainEffect(
     }
 
     private fun adjustCropping(surfaceSize: SizeF) {
-        val imageCropFgd = ImageCrop.centerCoverCrop(
-            surfaceSize.width,
-            surfaceSize.height,
-            rainConfig.foreground.width.toFloat(),
-            rainConfig.foreground.height.toFloat()
-        )
+        val imageCropFgd =
+            ImageCrop.centerCoverCrop(
+                surfaceSize.width,
+                surfaceSize.height,
+                rainConfig.foreground.width.toFloat(),
+                rainConfig.foreground.height.toFloat()
+            )
         rainConfig.shader.setFloatUniform(
             "uvOffsetFgd",
             imageCropFgd.leftOffset,
@@ -81,12 +82,13 @@ class RainEffect(
             imageCropFgd.horizontalScale,
             imageCropFgd.verticalScale
         )
-        val imageCropBgd = ImageCrop.centerCoverCrop(
-            surfaceSize.width,
-            surfaceSize.height,
-            rainConfig.background.width.toFloat(),
-            rainConfig.background.height.toFloat()
-        )
+        val imageCropBgd =
+            ImageCrop.centerCoverCrop(
+                surfaceSize.width,
+                surfaceSize.height,
+                rainConfig.background.width.toFloat(),
+                rainConfig.background.height.toFloat()
+            )
         rainConfig.shader.setFloatUniform(
             "uvOffsetBgd",
             imageCropBgd.leftOffset,
@@ -98,7 +100,10 @@ class RainEffect(
             imageCropBgd.verticalScale
         )
         rainConfig.shader.setFloatUniform("screenSize", surfaceSize.width, surfaceSize.height)
-        rainConfig.shader.setFloatUniform("screenAspectRatio", surfaceSize.getAspectRatio())
+        rainConfig.shader.setFloatUniform(
+            "screenAspectRatio",
+            GraphicsUtils.getAspectRatio(surfaceSize)
+        )
     }
 
     private fun updateTextureUniforms() {
@@ -130,10 +135,7 @@ class RainEffect(
                 BitmapShader(it, Shader.TileMode.MIRROR, Shader.TileMode.MIRROR)
             )
         }
-        rainConfig.colorGradingShader.setFloatUniform(
-            "intensity",
-            rainConfig.colorGradingIntensity
-        )
+        rainConfig.colorGradingShader.setFloatUniform("intensity", rainConfig.colorGradingIntensity)
     }
 
     private companion object {

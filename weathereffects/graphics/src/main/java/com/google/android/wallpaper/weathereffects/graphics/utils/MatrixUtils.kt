@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.android.wallpaper.weathereffects.utils
+package com.google.android.wallpaper.weathereffects.graphics.utils
 
 import android.graphics.Matrix
 import android.util.SizeF
 
 /** Helper functions for matrix operations. */
 object MatrixUtils {
-    /**
-     * Returns a [Matrix] that crops the image and centers to the screen.
-     */
+    /** Returns a [Matrix] that crops the image and centers to the screen. */
     fun centerCropMatrix(surfaceSize: SizeF, imageSize: SizeF): Matrix {
         val widthScale = surfaceSize.width / imageSize.width
         val heightScale = surfaceSize.height / imageSize.height

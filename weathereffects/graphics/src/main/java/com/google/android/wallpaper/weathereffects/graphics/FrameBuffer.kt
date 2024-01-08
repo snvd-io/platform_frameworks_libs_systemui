@@ -30,35 +30,37 @@ import java.util.concurrent.Executors
 /** A wrapper that handles drawing into a [HardwareBuffer] and releasing resources. */
 class FrameBuffer(width: Int, height: Int, format: Int = HardwareBuffer.RGBA_8888) {
 
-    private val buffer = HardwareBuffer.create(
-        width,
-        height,
-        format,
-        /* layers = */ 1,
-        // USAGE_GPU_SAMPLED_IMAGE: buffer will be read by the GPU
-        // USAGE_GPU_COLOR_OUTPUT: buffer will be written by the GPU
-        /* usage= */ HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE or HardwareBuffer.USAGE_GPU_COLOR_OUTPUT
-    )
+    private val buffer =
+        HardwareBuffer.create(
+            width,
+            height,
+            format,
+            /* layers = */ 1,
+            // USAGE_GPU_SAMPLED_IMAGE: buffer will be read by the GPU
+            // USAGE_GPU_COLOR_OUTPUT: buffer will be written by the GPU
+            /* usage= */ HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE or
+                HardwareBuffer.USAGE_GPU_COLOR_OUTPUT
+        )
     private val renderer = HardwareBufferRenderer(buffer)
-    private val node = RenderNode("content").also {
-        it.setPosition(0, 0, width, height)
-        renderer.setContentRoot(it)
-    }
+    private val node =
+        RenderNode("content").also {
+            it.setPosition(0, 0, width, height)
+            renderer.setContentRoot(it)
+        }
 
     private val executor = Executors.newFixedThreadPool(/* nThreads = */ 1)
     private val colorSpace = ColorSpace.get(ColorSpace.Named.SRGB)
 
     /**
      * Recording drawing commands.
+     *
      * @return RecordingCanvas
      */
     fun beginDrawing(): RecordingCanvas {
         return node.beginRecording()
     }
 
-    /**
-     * Ends drawing. Must be paired with [beginDrawing].
-     */
+    /** Ends drawing. Must be paired with [beginDrawing]. */
     fun endDrawing() {
         node.endRecording()
     }
@@ -73,33 +75,28 @@ class FrameBuffer(width: Int, height: Int, format: Int = HardwareBuffer.RGBA_888
     /**
      * Invokes the [onImageReady] callback when the new image is acquired, which is associated with
      * the frame buffer.
+     *
      * @param onImageReady callback that will be called once the image is ready.
      * @param callbackExecutor executor to use to trigger the callback. Likely to be the main
-     * executor.
+     *   executor.
      */
-    fun tryObtainingImage(
-        onImageReady: (image: Bitmap) -> Unit,
-        callbackExecutor: Executor
-    ) {
-        renderer.obtainRenderRequest()
-            .setColorSpace(colorSpace)
-            .draw(executor) { result ->
-                if (result.status == HardwareBufferRenderer.RenderResult.SUCCESS) {
-                    result.fence.await(Duration.ofMillis(3000))
-                    Bitmap.wrapHardwareBuffer(buffer, colorSpace)?.let {
-                        callbackExecutor.execute { onImageReady.invoke(it) }
-                    }
+    fun tryObtainingImage(onImageReady: (image: Bitmap) -> Unit, callbackExecutor: Executor) {
+        renderer.obtainRenderRequest().setColorSpace(colorSpace).draw(executor) { result ->
+            if (result.status == HardwareBufferRenderer.RenderResult.SUCCESS) {
+                result.fence.await(Duration.ofMillis(3000))
+                Bitmap.wrapHardwareBuffer(buffer, colorSpace)?.let {
+                    callbackExecutor.execute { onImageReady.invoke(it) }
                 }
             }
+        }
     }
-
 
     /**
      * Configure the [FrameBuffer] to apply to this RenderNode. This will apply a visual effect to
      * the end result of the contents of this RenderNode before it is drawn into the destination.
      *
      * @param renderEffect to be applied to the [FrameBuffer]. Passing null clears all previously
-     * configured RenderEffects.
+     *   configured RenderEffects.
      */
     fun setRenderEffect(renderEffect: RenderEffect?) = node.setRenderEffect(renderEffect)
 }

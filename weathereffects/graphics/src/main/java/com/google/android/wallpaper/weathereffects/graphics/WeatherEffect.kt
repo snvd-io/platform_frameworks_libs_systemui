@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The Android Open Source Project
+ * Copyright (C) 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.wallpaper.weathereffects
+package com.google.android.wallpaper.weathereffects.graphics
 
 import android.graphics.Canvas
 import android.util.SizeF
@@ -34,7 +34,7 @@ interface WeatherEffect {
      *
      * @param deltaMillis The time in millis since the last time [onUpdate] was called.
      * @param frameTimeNanos The time in nanoseconds from the previous Vsync frame, in the
-     * [System.nanoTime] timebase.
+     *   [System.nanoTime] timebase.
      */
     fun update(deltaMillis: Long, frameTimeNanos: Long)
 
