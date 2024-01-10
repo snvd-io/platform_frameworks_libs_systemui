@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.wallpaper.weathereffects.utils
+package com.google.android.wallpaper.weathereffects.graphics.utils
 
 import android.content.Context
 import android.content.res.AssetManager
@@ -26,6 +26,7 @@ import android.renderscript.Allocation
 import android.renderscript.Element
 import android.renderscript.RenderScript
 import android.renderscript.ScriptIntrinsicBlur
+import android.util.SizeF
 import androidx.annotation.FloatRange
 
 /** Contains functions for rendering. */
@@ -36,7 +37,6 @@ object GraphicsUtils {
      *
      * @param assetManager an [AssetManager] instance.
      * @param path path to the shader to load.
-     *
      * @return returns a [RuntimeShader] object.
      */
     fun loadShader(assetManager: AssetManager, path: String): RuntimeShader {
@@ -50,7 +50,6 @@ object GraphicsUtils {
      *
      * @param assetManager an [AssetManager] instance.
      * @param path path to the texture bitmap to load.
-     *
      * @return returns a Bitmap.
      */
     fun loadTexture(assetManager: AssetManager, path: String): Bitmap? {
@@ -70,20 +69,16 @@ object GraphicsUtils {
      * @param sourceBitmap the original image that we want to blur.
      * @param blurRadius the amount that we want to blur (only values from 0 to 25).
      * @param config the bitmap config (optional).
-     *
      * @return returns a Bitmap.
      */
     fun blurImage(
         context: Context,
         sourceBitmap: Bitmap,
-        @FloatRange(from = 0.0, to = 25.0)
-        blurRadius: Float,
+        @FloatRange(from = 0.0, to = 25.0) blurRadius: Float,
         config: Bitmap.Config = Bitmap.Config.ARGB_8888
     ): Bitmap {
-        //TODO: This might not be the ideal option, find a better one.
-        val blurredImage = Bitmap.createBitmap(
-            sourceBitmap.copy(config, true)
-        )
+        // TODO: This might not be the ideal option, find a better one.
+        val blurredImage = Bitmap.createBitmap(sourceBitmap.copy(config, true))
         val renderScript = RenderScript.create(context)
         val blur = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript))
         val allocationIn = Allocation.createFromBitmap(renderScript, sourceBitmap)
@@ -93,6 +88,18 @@ object GraphicsUtils {
         blur.forEach(allocationOut)
         allocationOut.copyTo(blurredImage)
         return blurredImage
+    }
+    /**
+     * @return the [Float] representing the aspect ratio of width / height, -1 if either width or
+     *   height is equal to or less than 0.
+     */
+    fun getAspectRatio(size: SizeF): Float {
+        val width = size.width
+        val height = size.height
+
+        return if (width <= 0 || height <= 0) {
+            -1f
+        } else width / height
     }
 
     private fun resolveShaderIncludes(assetManager: AssetManager, string: String): String {

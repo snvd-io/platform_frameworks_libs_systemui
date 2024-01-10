@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.google.android.wallpaper.weathereffects.fog
+package com.google.android.wallpaper.weathereffects.graphics.fog
 
 import android.graphics.BitmapShader
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Shader
 import android.util.SizeF
-import com.google.android.torus.utils.extensions.getAspectRatio
-import com.google.android.wallpaper.weathereffects.WeatherEffect
-import com.google.android.wallpaper.weathereffects.utils.ImageCrop
+import com.google.android.wallpaper.weathereffects.graphics.WeatherEffect
+import com.google.android.wallpaper.weathereffects.graphics.utils.GraphicsUtils
+import com.google.android.wallpaper.weathereffects.graphics.utils.ImageCrop
 import kotlin.math.sin
 import kotlin.random.Random
 
@@ -71,12 +71,13 @@ class FogEffect(
     }
 
     private fun adjustCropping(surfaceSize: SizeF) {
-        val imageCropFgd = ImageCrop.centerCoverCrop(
-            surfaceSize.width,
-            surfaceSize.height,
-            fogConfig.foreground.width.toFloat(),
-            fogConfig.foreground.height.toFloat()
-        )
+        val imageCropFgd =
+            ImageCrop.centerCoverCrop(
+                surfaceSize.width,
+                surfaceSize.height,
+                fogConfig.foreground.width.toFloat(),
+                fogConfig.foreground.height.toFloat()
+            )
         fogConfig.shader.setFloatUniform(
             "uvOffsetFgd",
             imageCropFgd.leftOffset,
@@ -87,12 +88,13 @@ class FogEffect(
             imageCropFgd.horizontalScale,
             imageCropFgd.verticalScale
         )
-        val imageCropBgd = ImageCrop.centerCoverCrop(
-            surfaceSize.width,
-            surfaceSize.height,
-            fogConfig.background.width.toFloat(),
-            fogConfig.background.height.toFloat()
-        )
+        val imageCropBgd =
+            ImageCrop.centerCoverCrop(
+                surfaceSize.width,
+                surfaceSize.height,
+                fogConfig.background.width.toFloat(),
+                fogConfig.background.height.toFloat()
+            )
         fogConfig.shader.setFloatUniform(
             "uvOffsetBgd",
             imageCropBgd.leftOffset,
@@ -104,7 +106,10 @@ class FogEffect(
             imageCropBgd.verticalScale
         )
         fogConfig.shader.setFloatUniform("screenSize", surfaceSize.width, surfaceSize.height)
-        fogConfig.shader.setFloatUniform("screenAspectRatio", surfaceSize.getAspectRatio())
+        fogConfig.shader.setFloatUniform(
+            "screenAspectRatio",
+            GraphicsUtils.getAspectRatio(surfaceSize)
+        )
     }
 
     private fun updateTextureUniforms() {
@@ -129,10 +134,7 @@ class FogEffect(
                 BitmapShader(it, Shader.TileMode.MIRROR, Shader.TileMode.MIRROR)
             )
         }
-        fogConfig.colorGradingShader.setFloatUniform(
-            "intensity",
-            fogConfig.colorGradingIntensity
-        )
+        fogConfig.colorGradingShader.setFloatUniform("intensity", fogConfig.colorGradingIntensity)
     }
 
     private companion object {

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.android.wallpaper.weathereffects.utils
+package com.google.android.wallpaper.weathereffects.graphics.utils
 
 /** Contains offsets and scales to position image inside a surface. */
 class ImageCrop(
     /**
-     * The left start of the image relatively to the left edge of the surface that will contain
-     * the image.
+     * The left start of the image relatively to the left edge of the surface that will contain the
+     * image.
      */
     val leftOffset: Float = 0f,
     /**
@@ -38,15 +38,14 @@ class ImageCrop(
 
         /**
          * Calculates the [ImageCrop] that would make the image cover the surface (that is, the
-         * image will be scaled to the smallest possible size so it fills the container,
-         * preserving the aspect ratio and cropping the image vertically or horizontally if
-         * necessary) and center its content.
+         * image will be scaled to the smallest possible size so it fills the container, preserving
+         * the aspect ratio and cropping the image vertically or horizontally if necessary) and
+         * center its content.
          *
          * @param surfaceWidth the width of the surface where the image will be displayed.
          * @param surfaceWidth the height of the surface where the image will be displayed.
          * @param imageWidth the width of the image that we want to display.
          * @param imageHeight the height of the image that we want to display.
-         *
          * @return the [ImageCrop] that will center cover the image into the surface.
          */
         fun centerCoverCrop(
@@ -58,11 +57,12 @@ class ImageCrop(
             val uvScaleHeight: Float = imageHeight / surfaceHeight
             val uvScaleWidth: Float = imageWidth / surfaceWidth
 
-            val uvScale = if (imageWidth / imageHeight > surfaceWidth / surfaceHeight) {
-                uvScaleHeight
-            } else {
-                uvScaleWidth
-            }
+            val uvScale =
+                if (imageWidth / imageHeight > surfaceWidth / surfaceHeight) {
+                    uvScaleHeight
+                } else {
+                    uvScaleWidth
+                }
 
             val horizontalOffset = (imageWidth - surfaceWidth * uvScale) / 2f
             val verticalOffset = (imageHeight - surfaceHeight * uvScale) / 2f
