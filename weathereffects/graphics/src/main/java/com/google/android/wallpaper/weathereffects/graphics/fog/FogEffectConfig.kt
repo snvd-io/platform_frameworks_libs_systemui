@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.android.wallpaper.weathereffects.fog
+package com.google.android.wallpaper.weathereffects.graphics.fog
 
 import android.content.res.AssetManager
 import android.graphics.Bitmap
 import android.graphics.RuntimeShader
 import androidx.annotation.FloatRange
-import com.google.android.wallpaper.weathereffects.utils.GraphicsUtils
+import com.google.android.wallpaper.weathereffects.graphics.utils.GraphicsUtils
 
 /** Configuration for a fog effect. */
 data class FogEffectConfig(
@@ -31,8 +31,7 @@ data class FogEffectConfig(
     /** The main lut (color grading) for the effect. */
     val lut: Bitmap?,
     /** The intensity of the color grading. 0: no color grading, 1: color grading in full effect. */
-    @FloatRange(from = 0.0, to = 1.0)
-    val colorGradingIntensity: Float,
+    @FloatRange(from = 0.0, to = 1.0) val colorGradingIntensity: Float,
     /** A bitmap containing the foreground of the image. */
     val foreground: Bitmap,
     /** A bitmap containing the background of the image. */
@@ -51,7 +50,6 @@ data class FogEffectConfig(
          * @param foreground a bitmap containing the foreground of the image.
          * @param background a bitmap containing the background of the image.
          * @param pixelDensity pixel density of the display.
-         *
          * @return the [FogEffectConfig] object.
          */
         fun create(
@@ -62,10 +60,8 @@ data class FogEffectConfig(
         ): FogEffectConfig {
             return FogEffectConfig(
                 shader = GraphicsUtils.loadShader(assets, "shaders/fog_effect.agsl"),
-                colorGradingShader = GraphicsUtils.loadShader(
-                    assets,
-                    "shaders/color_grading_lut.agsl"
-                ),
+                colorGradingShader =
+                    GraphicsUtils.loadShader(assets, "shaders/color_grading_lut.agsl"),
                 lut = GraphicsUtils.loadTexture(assets, "textures/lut_rain_and_fog.png"),
                 colorGradingIntensity = 0.7f,
                 foreground,

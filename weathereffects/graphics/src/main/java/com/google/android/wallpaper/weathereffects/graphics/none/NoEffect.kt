@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package com.google.android.wallpaper.weathereffects.none
+package com.google.android.wallpaper.weathereffects.graphics.none
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.Matrix
 import android.util.SizeF
-import com.google.android.wallpaper.weathereffects.WeatherEffect
-import com.google.android.wallpaper.weathereffects.utils.MatrixUtils
+import com.google.android.wallpaper.weathereffects.graphics.WeatherEffect
+import com.google.android.wallpaper.weathereffects.graphics.utils.MatrixUtils
 
 /** Simply draws foreground and background images with no weather effect. */
-class NoEffect(
-    val foreground: Bitmap,
-    val background: Bitmap,
-    private var surfaceSize: SizeF
-): WeatherEffect {
+class NoEffect(val foreground: Bitmap, val background: Bitmap, private var surfaceSize: SizeF) :
+    WeatherEffect {
     override fun resize(newSurfaceSize: SizeF) {
         surfaceSize = newSurfaceSize
     }
@@ -40,10 +36,7 @@ class NoEffect(
             background,
             MatrixUtils.centerCropMatrix(
                 surfaceSize,
-                SizeF(
-                    background.width.toFloat(),
-                    background.height.toFloat()
-                )
+                SizeF(background.width.toFloat(), background.height.toFloat())
             ),
             null
         )
@@ -52,10 +45,7 @@ class NoEffect(
             foreground,
             MatrixUtils.centerCropMatrix(
                 surfaceSize,
-                SizeF(
-                    foreground.width.toFloat(),
-                    foreground.height.toFloat()
-                )
+                SizeF(foreground.width.toFloat(), foreground.height.toFloat())
             ),
             null
         )
