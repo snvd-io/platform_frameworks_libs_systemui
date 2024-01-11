@@ -14,27 +14,24 @@
  * limitations under the License.
  */
 
-package com.google.android.wallpaper.weathereffects.snow
+package com.google.android.wallpaper.weathereffects.graphics.rain
 
-import androidx.annotation.FloatRange
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.RuntimeShader
-import com.google.android.wallpaper.weathereffects.utils.GraphicsUtils
+import androidx.annotation.FloatRange
+import com.google.android.wallpaper.weathereffects.graphics.utils.GraphicsUtils
 
-/** Configuration for a snow effect. */
-data class SnowEffectConfig(
+/** Configuration for a rain effect. */
+data class RainEffectConfig(
     /** The main shader of the effect. */
     val shader: RuntimeShader,
-    /** The shader of accumulated snow effect. */
-    val accumulatedSnowShader: RuntimeShader,
     /** The color grading shader. */
     val colorGradingShader: RuntimeShader,
     /** The main lut (color grading) for the effect. */
     val lut: Bitmap?,
     /** The intensity of the color grading. 0: no color grading, 1: color grading in full effect. */
-    @FloatRange(from = 0.0, to = 1.0)
-    val colorGradingIntensity: Float,
+    @FloatRange(from = 0.0, to = 1.0) val colorGradingIntensity: Float,
     /** A bitmap containing the foreground of the image. */
     val foreground: Bitmap,
     /** A bitmap containing the background of the image. */
@@ -46,30 +43,24 @@ data class SnowEffectConfig(
     companion object {
 
         /**
-         * A convenient way for creating a [SnowEffectConfig]. If the client does not want to use
-         * this constructor, a [SnowEffectConfig] object can still be created a directly.
+         * A convenient way for creating a [RainEffectConfig]. If the client does not want to use
+         * this constructor, a [RainEffectConfig] object can still be created a directly.
          *
          * @param context the application context.
          * @param foreground a bitmap containing the foreground of the image.
          * @param background a bitmap containing the background of the image.
-         *
-         * @return the [SnowEffectConfig] object.
+         * @return the [RainEffectConfig] object.
          */
-        fun create(context: Context, foreground: Bitmap, background: Bitmap): SnowEffectConfig {
-            return SnowEffectConfig(
-                shader = GraphicsUtils.loadShader(context.assets, "shaders/snow_effect.agsl"),
-                accumulatedSnowShader = GraphicsUtils.loadShader(
-                    context.assets, "shaders/snow_accumulation.agsl"
-                ),
-                colorGradingShader = GraphicsUtils.loadShader(
-                    context.assets,
-                    "shaders/color_grading_lut.agsl"
-                ),
+        fun create(context: Context, foreground: Bitmap, background: Bitmap): RainEffectConfig {
+            return RainEffectConfig(
+                shader = GraphicsUtils.loadShader(context.assets, "shaders/rain_effect.agsl"),
+                colorGradingShader =
+                    GraphicsUtils.loadShader(context.assets, "shaders/color_grading_lut.agsl"),
                 lut = GraphicsUtils.loadTexture(context.assets, "textures/lut_rain_and_fog.png"),
                 colorGradingIntensity = 0.7f,
                 foreground,
                 background,
-                GraphicsUtils.blurImage(context, background, 20f)
+                GraphicsUtils.blurImage(context, background, 10f)
             )
         }
     }
