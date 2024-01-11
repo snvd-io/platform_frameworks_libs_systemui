@@ -17,7 +17,6 @@
 package com.android.app.tracing
 
 import android.os.Trace
-import android.os.TraceNameSupplier
 import com.android.app.tracing.coroutines.traceCoroutine
 import kotlin.random.Random
 
@@ -66,7 +65,7 @@ import kotlin.random.Random
  * @see traceCoroutine
  */
 fun beginSlice(sliceName: String) {
-    Trace.traceBegin(Trace.TRACE_TAG_APP, sliceName)
+    traceBegin(sliceName)
 }
 
 /**
@@ -78,11 +77,11 @@ fun beginSlice(sliceName: String) {
  * @see traceCoroutine
  */
 fun endSlice() {
-    Trace.traceEnd(Trace.TRACE_TAG_APP)
+    traceEnd()
 }
 
 fun isEnabled(): Boolean {
-    return Trace.isTagEnabled(Trace.TRACE_TAG_APP)
+    return Trace.isEnabled()
 }
 
 /**
@@ -143,20 +142,6 @@ object TraceUtils {
     }
 
     /**
-     * Helper function for creating a Runnable object that implements TraceNameSupplier.
-     *
-     * This is useful for posting Runnables to Handlers with meaningful names.
-     */
-    @JvmStatic
-    inline fun namedRunnable(tag: String, crossinline block: () -> Unit): Runnable {
-        return object : Runnable, TraceNameSupplier {
-            override fun getTraceName(): String = tag
-
-            override fun run() = block()
-        }
-    }
-
-    /**
      * Creates an async slice in a track called "AsyncTraces".
      *
      * This can be used to trace coroutine code. Note that all usages of this method will appear
@@ -176,45 +161,11 @@ object TraceUtils {
     @JvmStatic
     inline fun <T> traceAsync(trackName: String, method: String, block: () -> T): T {
         val cookie = Random.nextInt()
-        Trace.asyncTraceForTrackBegin(Trace.TRACE_TAG_APP, trackName, method, cookie)
+        asyncTraceForTrackBegin(trackName, method, cookie)
         try {
             return block()
         } finally {
-            Trace.asyncTraceForTrackEnd(Trace.TRACE_TAG_APP, trackName, cookie)
+            asyncTraceForTrackEnd(trackName, method, cookie)
         }
-    }
-
-    /**
-     * Writes a trace message indicating that an instant event occurred on the current thread.
-     * Unlike slices, instant events have no duration and do not need to be matched with another
-     * call. Perfetto will display instant events using an arrow pointing to the timestamp they
-     * occurred:
-     * ```
-     * Thread #1 | [==============]               [======]
-     *           |     [====]                        ^
-     *           |        ^
-     * ```
-     *
-     * @param eventName The name of the event to appear in the trace.
-     */
-    fun instant(eventName: String) {
-        Trace.instant(Trace.TRACE_TAG_APP, eventName)
-    }
-
-    /**
-     * Writes a trace message indicating that an instant event occurred on the given track. Unlike
-     * slices, instant events have no duration and do not need to be matched with another call.
-     * Perfetto will display instant events using an arrow pointing to the timestamp they occurred:
-     * ```
-     * Async  | [==============]               [======]
-     *  Track |     [====]                        ^
-     *   Name |        ^
-     * ```
-     *
-     * @param trackName The track where the event should appear in the trace.
-     * @param eventName The name of the event to appear in the trace.
-     */
-    fun instantForTrack(trackName: String, eventName: String) {
-        Trace.instantForTrack(Trace.TRACE_TAG_APP, trackName, eventName)
     }
 }

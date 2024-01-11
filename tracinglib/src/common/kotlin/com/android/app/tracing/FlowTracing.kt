@@ -15,7 +15,6 @@
  */
 package com.android.app.tracing
 
-import android.os.Trace
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onEach
 
@@ -39,7 +38,7 @@ object FlowTracing {
         var count = 0
         return onEach {
             count += 1
-            Trace.traceCounter(Trace.TRACE_TAG_APP, trackName, count)
+            traceCounter(trackName, count)
         }
     }
 }

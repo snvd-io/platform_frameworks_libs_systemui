@@ -16,7 +16,6 @@
 
 package com.android.app.tracing.coroutines
 
-import android.os.Build
 import android.util.Log
 import com.android.app.tracing.beginSlice
 import com.android.app.tracing.endSlice
@@ -117,7 +116,7 @@ internal class TraceData : TraceStatus {
          * If true, throw an exception instead of printing a warning when trace sections beginnings
          * and ends are mismatched.
          */
-        private val STRICT_MODE = Build.IS_ENG
+        private val STRICT_MODE = false
 
         private val MISMATCHED_TRACE_ERROR_MESSAGE =
             """

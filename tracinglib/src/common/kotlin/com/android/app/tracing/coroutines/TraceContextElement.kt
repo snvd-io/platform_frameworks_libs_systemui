@@ -16,19 +16,16 @@
 
 package com.android.app.tracing.coroutines
 
-import com.android.app.tracing.TraceUtils.instant
+import com.android.app.tracing.instant
 import com.android.systemui.Flags.coroutineTracing
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlinx.coroutines.CopyableThreadContextElement
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /**
  * Returns a new [CoroutineContext] used for tracing. Used to hide internal implementation details.
  */
-@OptIn(ExperimentalCoroutinesApi::class)
 fun createCoroutineTracingContext(): CoroutineContext {
     return if (coroutineTracing()) TraceContextElement() else EmptyCoroutineContext
 }
@@ -41,8 +38,6 @@ fun createCoroutineTracingContext(): CoroutineContext {
  *
  * @see traceCoroutine
  */
-@OptIn(DelicateCoroutinesApi::class)
-@ExperimentalCoroutinesApi
 internal class TraceContextElement(private val traceData: TraceData = TraceData()) :
     CopyableThreadContextElement<TraceData?> {
 
@@ -51,7 +46,6 @@ internal class TraceContextElement(private val traceData: TraceData = TraceData(
     override val key: CoroutineContext.Key<*>
         get() = Key
 
-    @OptIn(ExperimentalStdlibApi::class)
     override fun updateThreadContext(context: CoroutineContext): TraceData? {
         val oldState = threadLocalTrace.get()
         oldState?.endAllOnThread()
@@ -61,7 +55,6 @@ internal class TraceContextElement(private val traceData: TraceData = TraceData(
         return oldState
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     override fun restoreThreadContext(context: CoroutineContext, oldState: TraceData?) {
         instant("suspending ${context[CoroutineDispatcher]}")
         traceData.endAllOnThread()
