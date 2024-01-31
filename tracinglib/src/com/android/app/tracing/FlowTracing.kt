@@ -15,6 +15,7 @@
  */
 package com.android.app.tracing
 
+import android.os.Trace
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onEach
 
@@ -25,9 +26,20 @@ object FlowTracing {
     inline fun <T> Flow<T>.traceEach(
         flowName: String,
         logcat: Boolean = false,
+        traceEmissionCount: Boolean = false,
         crossinline valueToString: (T) -> String = { it.toString() }
     ): Flow<T> {
         val stateLogger = TraceStateLogger(flowName, logcat = logcat)
-        return onEach { stateLogger.log(valueToString(it)) }
+        val baseFlow = if (traceEmissionCount) traceEmissionCount(flowName) else this
+        return baseFlow.onEach { stateLogger.log(valueToString(it)) }
+    }
+
+    fun <T> Flow<T>.traceEmissionCount(flowName: String): Flow<T> {
+        val trackName = "$flowName#emissionCount"
+        var count = 0
+        return onEach {
+            count += 1
+            Trace.traceCounter(Trace.TRACE_TAG_APP, trackName, count)
+        }
     }
 }
