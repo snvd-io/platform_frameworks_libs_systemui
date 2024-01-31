@@ -8,6 +8,13 @@ flag {
 }
 
 flag {
+    name: "return_animation_framework_library"
+    namespace: "systemui"
+    description: "Turn on Return functionality in the Animation library"
+    bug: "273205603"
+}
+
+flag {
     name: "shade_allow_back_gesture"
     namespace: "systemui"
     description: "Allow Back Gestures in Shade"
