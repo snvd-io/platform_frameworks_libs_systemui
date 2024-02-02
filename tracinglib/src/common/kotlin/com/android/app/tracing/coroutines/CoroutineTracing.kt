@@ -18,7 +18,8 @@ package com.android.app.tracing.coroutines
 
 import android.os.Trace
 import android.util.Log
-import com.android.app.tracing.TraceUtils
+import com.android.app.tracing.asyncTraceForTrackBegin
+import com.android.app.tracing.asyncTraceForTrackEnd
 import com.android.systemui.Flags.coroutineTracing
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -26,7 +27,6 @@ import kotlin.coroutines.coroutineContext
 import kotlin.random.Random
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -34,6 +34,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 @PublishedApi internal const val DEBUG_COROUTINE_TRACING = false
+@PublishedApi internal const val TAG = "CoroutineTracing"
+@PublishedApi internal const val DEFAULT_TRACK_NAME = "AsyncTraces"
 
 /**
  * Convenience function for calling [CoroutineScope.launch] with [traceCoroutine] to enable tracing.
@@ -164,7 +166,6 @@ suspend inline fun <T> withContext(
  * @see endSlice
  * @see traceCoroutine
  */
-@OptIn(ExperimentalCoroutinesApi::class)
 suspend inline fun <T> traceCoroutine(spanName: () -> String, block: () -> T): T {
     // For coroutine tracing to work, trace spans must be added and removed even when
     // tracing is not active (i.e. when TRACE_TAG_APP is disabled). Otherwise, when the
@@ -183,26 +184,16 @@ suspend inline fun <T> traceCoroutine(spanName: () -> String, block: () -> T): T
     // For now, also trace to "AsyncTraces". This will allow us to verify the correctness
     // of the COROUTINE_TRACING feature flag.
     val asyncTraceCookie =
-        if (Trace.isTagEnabled(Trace.TRACE_TAG_APP))
-            Random.nextInt(TraceData.FIRST_VALID_SPAN, Int.MAX_VALUE)
+        if (Trace.isEnabled()) Random.nextInt(TraceData.FIRST_VALID_SPAN, Int.MAX_VALUE)
         else TraceData.INVALID_SPAN
     if (asyncTraceCookie != TraceData.INVALID_SPAN) {
-        Trace.asyncTraceForTrackBegin(
-            Trace.TRACE_TAG_APP,
-            TraceUtils.DEFAULT_TRACK_NAME,
-            spanString,
-            asyncTraceCookie
-        )
+        asyncTraceForTrackBegin(DEFAULT_TRACK_NAME, spanString, asyncTraceCookie)
     }
     try {
         return block()
     } finally {
         if (asyncTraceCookie != TraceData.INVALID_SPAN) {
-            Trace.asyncTraceForTrackEnd(
-                Trace.TRACE_TAG_APP,
-                TraceUtils.DEFAULT_TRACK_NAME,
-                asyncTraceCookie
-            )
+            asyncTraceForTrackEnd(DEFAULT_TRACK_NAME, spanString, asyncTraceCookie)
         }
         if (tracer is TraceData) {
             tracer.endSpan(coroutineSpanCookie)
@@ -215,7 +206,6 @@ suspend inline fun <T> traceCoroutine(spanName: String, block: () -> T): T =
     traceCoroutine({ spanName }, block)
 
 @PublishedApi
-@OptIn(ExperimentalCoroutinesApi::class)
 internal suspend fun getTraceData(): TraceStatus {
     return if (!coroutineTracing()) {
         MissingTraceData("Experimental flag COROUTINE_TRACING is off")
@@ -228,7 +218,7 @@ internal suspend fun getTraceData(): TraceStatus {
 
 @PublishedApi
 internal inline fun logVerbose(logMessage: String, spanName: () -> String) {
-    if (DEBUG_COROUTINE_TRACING && Log.isLoggable(TraceUtils.TAG, Log.VERBOSE)) {
-        Log.v(TraceUtils.TAG, "$logMessage. Dropping trace section: \"${spanName()}\"")
+    if (DEBUG_COROUTINE_TRACING && Log.isLoggable(TAG, Log.VERBOSE)) {
+        Log.v(TAG, "$logMessage. Dropping trace section: \"${spanName()}\"")
     }
 }
