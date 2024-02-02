@@ -35,7 +35,7 @@ int imod(int a, int b) {
 }
 
 // 2D hash without bit-wise operations
-vec2 hash(vec2 p) {
+vec2 ihash2d(vec2 p) {
     int a = int(p.x + p.y) * 15823;
     int b = a * 65536; // a << 16
 
@@ -89,9 +89,9 @@ float simplex2d_flow(vec2 p, float rot, float time) {
     vec2 v2 = v0 - 1.0 + 2.*UNSKEW;
 
     // Get random gradient vector.
-    vec2 g0 = hash2d(i);
-    vec2 g1 = hash2d(i+walk);
-    vec2 g2 = hash2d(i+1.0);
+    vec2 g0 = ihash2d(i);
+    vec2 g1 = ihash2d(i+walk);
+    vec2 g2 = ihash2d(i+1.0);
 
     // Make the gradient vectors dynamic by adding rotations.
     g0 += getVectorFromAngle(rot * time * hash1d(i));
@@ -118,9 +118,9 @@ float simplex2d(vec2 p) {
     vec2 v2 = v0 - 1.0 + 2.*UNSKEW;
 
     // Get random gradient vector.
-    vec2 g0 = hash2d(i);
-    vec2 g1 = hash2d(i+walk);
-    vec2 g2 = hash2d(i+1.0);
+    vec2 g0 = ihash2d(i);
+    vec2 g1 = ihash2d(i+walk);
+    vec2 g2 = ihash2d(i+1.0);
 
     return kernel_summation(v0, v1, v2, g0, g1, g2);
 }
