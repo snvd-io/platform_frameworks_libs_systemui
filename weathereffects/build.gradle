@@ -74,7 +74,6 @@ android {
             // TODO: Split out debug source.
             java.srcDirs = ["${rootDir}/src", "${rootDir}/debug/src"]
             res.srcDirs = ["${rootDir}/res", "${rootDir}/debug/res"]
-            assets.srcDirs = ["${rootDir}/assets"]
             manifest.srcFile "AndroidManifest.xml"
         }
 
