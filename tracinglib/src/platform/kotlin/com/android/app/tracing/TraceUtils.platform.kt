@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The Android Open Source Project
+ * Copyright (C) 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.android.app.tracing
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.onEach
+import android.os.TraceNameSupplier
 
-/** Utilities to trace Flows */
-object FlowTracing {
+inline fun namedRunnable(tag: String, crossinline block: () -> Unit): Runnable {
+    return object : Runnable, TraceNameSupplier {
+        override fun getTraceName(): String = tag
 
-    /** Logs each flow element to a trace. */
-    inline fun <T> Flow<T>.traceEach(
-        flowName: String,
-        logcat: Boolean = false,
-        crossinline valueToString: (T) -> String = { it.toString() }
-    ): Flow<T> {
-        val stateLogger = TraceStateLogger(flowName, logcat = logcat)
-        return onEach { stateLogger.log(valueToString(it)) }
+        override fun run() = block()
+    }
+}
+
+inline fun instantForTrack(trackName: String, eventName: () -> String) {
+    if (isEnabled()) {
+        instantForTrack(trackName, eventName())
     }
 }
