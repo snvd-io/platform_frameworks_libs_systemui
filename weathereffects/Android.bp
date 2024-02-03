@@ -32,6 +32,9 @@ android_library {
         "graphics/src/**/*.java",
         "graphics/src/**/*.kt",
     ],
+    asset_dirs: [
+        "graphics/assets",
+    ],
     javacflags: ["-Adagger.fastInit=enabled"],
     kotlincflags: ["-Xjvm-default=all"],
     plugins: ["dagger2-compiler"],
