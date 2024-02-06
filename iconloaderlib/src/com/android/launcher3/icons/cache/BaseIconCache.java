@@ -33,6 +33,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.PackageManager.PackageInfoFlags;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -46,7 +47,6 @@ import android.os.Handler;
 import android.os.LocaleList;
 import android.os.Looper;
 import android.os.Process;
-import android.os.SystemClock;
 import android.os.Trace;
 import android.os.UserHandle;
 import android.text.TextUtils;
@@ -554,6 +554,7 @@ public abstract class BaseIconCache {
      */
     @WorkerThread
     @NonNull
+    @SuppressWarnings("NewApi")
     protected CacheEntry getEntryForPackageLocked(@NonNull final String packageName,
             @NonNull final UserHandle user, final boolean useLowResIcon) {
         assertWorkerThread();
@@ -567,9 +568,11 @@ public abstract class BaseIconCache {
             // Check the DB first.
             if (!getEntryFromDBLocked(cacheKey, entry, useLowResIcon)) {
                 try {
-                    int flags = Process.myUserHandle().equals(user) ? 0 :
+                    long flags = Process.myUserHandle().equals(user) ? 0 :
                             PackageManager.GET_UNINSTALLED_PACKAGES;
-                    PackageInfo info = mPackageManager.getPackageInfo(packageName, flags);
+                    flags |= PackageManager.MATCH_ARCHIVED_PACKAGES;
+                    PackageInfo info = mPackageManager.getPackageInfo(packageName,
+                            PackageInfoFlags.of(flags));
                     ApplicationInfo appInfo = info.applicationInfo;
                     if (appInfo == null) {
                         throw new NameNotFoundException("ApplicationInfo is null");
