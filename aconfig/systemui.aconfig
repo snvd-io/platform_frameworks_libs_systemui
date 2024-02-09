@@ -20,3 +20,13 @@ flag {
     description: "Allow Back Gestures in Shade"
     bug: "309545085"
 }
+
+flag {
+    name: "enable_home_delay"
+    namespace: "systemui"
+    description: "Enables fix that exposes signal to notify the completion of the RRO loading."
+    bug: "307507412"
+    metadata {
+        purpose: PURPOSE_BUGFIX
+    }
+}
