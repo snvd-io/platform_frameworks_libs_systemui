@@ -30,14 +30,16 @@ data class FogEffectConfig(
     val colorGradingShader: RuntimeShader,
     /** The main lut (color grading) for the effect. */
     val lut: Bitmap?,
-    /** The intensity of the color grading. 0: no color grading, 1: color grading in full effect. */
-    @FloatRange(from = 0.0, to = 1.0) val colorGradingIntensity: Float,
     /** A bitmap containing the foreground of the image. */
     val foreground: Bitmap,
     /** A bitmap containing the background of the image. */
     val background: Bitmap,
     /** Pixel density of the display. Used for dithering. */
-    val pixelDensity: Float
+    val pixelDensity: Float,
+    /** The amount of the fog. This contributes to the color grading as well. */
+    @FloatRange(from = 0.0, to = 1.0) val intensity: Float = 1f,
+    /** The intensity of the color grading. 0: no color grading, 1: color grading in full effect. */
+    @FloatRange(from = 0.0, to = 1.0) val colorGradingIntensity: Float = 0.7f,
 ) {
 
     companion object {
@@ -63,7 +65,6 @@ data class FogEffectConfig(
                 colorGradingShader =
                     GraphicsUtils.loadShader(assets, "shaders/color_grading_lut.agsl"),
                 lut = GraphicsUtils.loadTexture(assets, "textures/lut_rain_and_fog.png"),
-                colorGradingIntensity = 0.7f,
                 foreground,
                 background,
                 pixelDensity
