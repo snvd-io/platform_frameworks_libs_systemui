@@ -139,6 +139,17 @@ vec4 main(float2 fragCoord) {
           uv,
           screenAspectRatio,
           time * 18.,
+          /* Grid size = */ vec2(20.0, 2.0),
+          intensity);
+
+    color.rgb = mix(color.rgb, highlightColor.rgb, rainVisibility * rain.dropMask);
+
+    // Mid layer
+    // Generate rain behind the subject.
+    rain = generateRain(
+          uv,
+          screenAspectRatio,
+          time * 21.4,
           /* Grid size = */ vec2(30.0, 4.0),
           intensity);
 
