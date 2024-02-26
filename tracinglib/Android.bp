@@ -25,5 +25,4 @@ java_library {
         "src/**/*.kt"
     ],
     kotlincflags: ["-Xjvm-default=all"],
-    platform_apis: true,
 }
