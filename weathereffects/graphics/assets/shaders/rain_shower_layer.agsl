@@ -74,7 +74,9 @@ vec3 drawSplashes(vec2 uv, vec2 fragCoord, vec3 color) {
     // Normalized time [0, 1].
     float cellTime = max((mod(t + delay * cellId, duration + delay) - delay) / duration, 0.);
 
-    return normalBlendWithWhiteSrc(color, drawSplash(cellUv, cellTime));
+    float splash = drawSplash(cellUv, cellTime) * smoothstep(0., 0.45, intensity);
+
+    return normalBlendWithWhiteSrc(color, splash);
 }
 
 vec4 main(float2 fragCoord) {

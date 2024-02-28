@@ -62,7 +62,7 @@ vec4 main(float2 fragCoord) {
         medDrippingRain.dropplets * medDrippingRain.droppletsMask, medDrippingRain.droppletsMask);
 
     // 4. Add static rain droplets on the glass surface. (They stay in place and dissapate.)
-    vec3 staticRain = generateStaticGlassRain(uv, screenAspectRatio, time);
+    vec3 staticRain = generateStaticGlassRain(uv, screenAspectRatio, time, intensity);
     dropMask = max(dropMask, staticRain.z);
     dropUvMasked = mix(dropUvMasked, staticRain.xy * staticRain.z, staticRain.z);
 
