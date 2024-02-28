@@ -26,6 +26,9 @@ uniform half intensity;
 #include "shaders/rain_constants.agsl"
 
 vec4 main(float2 fragCoord) {
+    // 0. Add a bit of noise so that the droplets are not perfect circles.
+    fragCoord += vec2(valueNoise(fragCoord) * 0.015 - 0.0025);
+
     float2 uv = fragCoord / screenSize;
 
     // 1. Generate small glass rain.
