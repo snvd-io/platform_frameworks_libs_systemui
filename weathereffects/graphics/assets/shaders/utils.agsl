@@ -35,6 +35,10 @@ mat2 rotationMat(float angleRad) {
   );
 }
 
+float sdfCircle(vec2 p, float r) {
+    return length(p) - r;
+}
+
 vec2 rotateAroundPoint(vec2 point, vec2 centerPoint, float angleRad) {
     return (point - centerPoint) * rotationMat(angleRad) + centerPoint;
 }
