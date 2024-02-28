@@ -75,3 +75,9 @@ vec3 normalBlend(vec3 b, vec3 f, float o) {
 vec3 normalBlendWithWhiteSrc(vec3 b, float o) {
     return b * (1. - o) + o;
 }
+
+float map(float value, float inMin, float inMax, float outMin, float outMax) {
+    float v = clamp(value, inMin, inMax);
+    float p = (v - inMin) / (inMax - inMin);
+    return p * (outMax - outMin) + outMin;
+}
