@@ -17,9 +17,17 @@ package {
 }
 
 android_app {
-    name: "TracingLibDemoApp",
+    name: "CoroutineTracingDemoApp",
     platform_apis: true,
+    certificate: "platform",
+    use_resource_processor: true,
     srcs: ["src/**/*.kt"],
     manifest: "app-manifest.xml",
-    use_resource_processor: true,
+    resource_dirs: ["res"],
+    static_libs: [
+        "tracinglib-platform",
+        "dagger2",
+        "jsr330",
+    ],
+    plugins: ["dagger2-compiler"],
 }
