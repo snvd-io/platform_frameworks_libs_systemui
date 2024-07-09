@@ -68,15 +68,15 @@ class WallpaperEffectsDebugActivity : TorusViewerActivity() {
 
     override fun getWallpaperEngine(context: Context, surfaceView: SurfaceView): TorusEngine {
         this.surfaceView = surfaceView
-        val engine = WeatherEngine(surfaceView.holder, context)
+        val engine = WeatherEngine(surfaceView.holder, mainScope, interactor, context)
         this.engine = engine
         return engine
     }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         WallpaperEffectsDebugApplication.graph.inject(this)
+        super.onCreate(savedInstanceState)
 
         setContentView(R.layout.debug_activity)
         setImmersiveFullScreen()
@@ -139,7 +139,6 @@ class WallpaperEffectsDebugActivity : TorusViewerActivity() {
                 view.onTouchEvent(event)
             }
 
-        engine?.initialize(mainScope, interactor)
         setDebugText()
     }
 
