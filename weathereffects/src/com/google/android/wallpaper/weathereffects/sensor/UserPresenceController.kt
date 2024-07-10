@@ -69,6 +69,12 @@ class UserPresenceController(
         updateUserPresence(isDeviceAwake = isAwake)
     }
 
+    /**
+     * Call when the keyguard is going away. This will happen before lock state is false (but it
+     * happens at the same time that unlock animation starts).
+     */
+    fun onKeyguardGoingAway() = updateUserPresence(isDeviceLocked = false)
+
     private fun updateUserPresence(
         isDeviceAwake: Boolean = deviceAwake,
         isDeviceLocked: Boolean = deviceLocked
@@ -82,12 +88,6 @@ class UserPresenceController(
             else -> UserPresence.ACTIVE // == awake && !locked.
         }
     }
-
-    /**
-     * Call when the keyguard is going away. This will happen before lock state is false (but it
-     * happens at the same time that unlock animation starts).
-     */
-    fun onKeyguardGoingAway() = updateUserPresence(isDeviceLocked = false)
 
     /** Define the different user presence available. */
     enum class UserPresence {
