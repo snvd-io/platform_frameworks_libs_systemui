@@ -43,10 +43,14 @@ class FogEffect(
         updateTextureUniforms()
         adjustCropping(surfaceSize)
         prepareColorGrading()
+        updateFogGridSize(surfaceSize)
         setIntensity(fogConfig.intensity)
     }
 
-    override fun resize(newSurfaceSize: SizeF) = adjustCropping(newSurfaceSize)
+    override fun resize(newSurfaceSize: SizeF) {
+        adjustCropping(newSurfaceSize)
+        updateFogGridSize(newSurfaceSize)
+    }
 
     override fun update(deltaMillis: Long, frameTimeNanos: Long) {
         val deltaTime = TimeUtils.millisToSeconds(deltaMillis)
@@ -152,21 +156,9 @@ class FogEffect(
             BitmapShader(fogConfig.cloudsTexture, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT)
         )
 
-        fogConfig.shader.setFloatUniform(
-            "cloudsSize",
-            fogConfig.cloudsTexture.width.toFloat(),
-            fogConfig.cloudsTexture.height.toFloat()
-        )
-
         fogConfig.shader.setInputBuffer(
             "fog",
             BitmapShader(fogConfig.fogTexture, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT)
-        )
-
-        fogConfig.shader.setFloatUniform(
-            "fogSize",
-            fogConfig.fogTexture.width.toFloat(),
-            fogConfig.fogTexture.height.toFloat()
         )
 
         fogConfig.shader.setFloatUniform("pixelDensity", fogConfig.pixelDensity)
@@ -181,5 +173,21 @@ class FogEffect(
             )
         }
         fogConfig.colorGradingShader.setFloatUniform("intensity", fogConfig.colorGradingIntensity)
+    }
+
+    private fun updateFogGridSize(surfaceSize: SizeF) {
+        val widthScreenScale =
+            GraphicsUtils.computeDefaultGridSize(surfaceSize, fogConfig.pixelDensity)
+        fogConfig.shader.setFloatUniform(
+            "cloudsSize",
+            widthScreenScale * fogConfig.cloudsTexture.width.toFloat(),
+            widthScreenScale * fogConfig.cloudsTexture.height.toFloat()
+        )
+
+        fogConfig.shader.setFloatUniform(
+            "fogSize",
+            widthScreenScale * fogConfig.fogTexture.width.toFloat(),
+            widthScreenScale * fogConfig.fogTexture.height.toFloat()
+        )
     }
 }
