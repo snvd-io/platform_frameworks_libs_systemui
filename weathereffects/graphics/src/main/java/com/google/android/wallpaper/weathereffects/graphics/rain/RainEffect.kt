@@ -28,6 +28,7 @@ import com.google.android.wallpaper.weathereffects.graphics.WeatherEffect
 import com.google.android.wallpaper.weathereffects.graphics.utils.GraphicsUtils
 import com.google.android.wallpaper.weathereffects.graphics.utils.ImageCrop
 import com.google.android.wallpaper.weathereffects.graphics.utils.SolidColorShader
+import com.google.android.wallpaper.weathereffects.graphics.utils.TimeUtils
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
@@ -62,7 +63,7 @@ class RainEffect(
     override fun resize(newSurfaceSize: SizeF) = adjustCropping(newSurfaceSize)
 
     override fun update(deltaMillis: Long, frameTimeNanos: Long) {
-        elapsedTime += TimeUnit.MILLISECONDS.toSeconds(deltaMillis)
+        elapsedTime += TimeUtils.millisToSeconds(deltaMillis)
 
         rainConfig.rainShowerShader.setFloatUniform("time", elapsedTime)
         rainConfig.glassRainShader.setFloatUniform("time", elapsedTime)
